@@ -23,7 +23,11 @@ CREATE TABLE
         password VARCHAR(150) NOT NULL,
         fullname VARCHAR (100) NOT NULL,
         CONSTRAINT fk_credential_id FOREIGN KEY(credential_id)
-            REFERENCES credentials(pk_credential_id)
+            REFERENCES credentials(pk_credential_id),
+        create_at TIMESTAMP 
+            WITH TIME ZONE DEFAULT NOW(),
+        update_at TIMESTAMP
+            WITH TIME ZONE DEFAULT NOW()
     );
 CREATE TABLE
     IF NOT EXISTS posts(
