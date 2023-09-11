@@ -8,8 +8,14 @@ edition = "2021"
 [dependencies]
 chrono = { version = "0.4.26", features = ["serde"] }
 dotenv = "0.15.0"
-rocket = "=0.5.0-rc.3"
+rocket = {version= "0.5.0-rc.3", features=["json"]}
 serde = { version = "1.0.186", features = ["derive"] }
-serde_json = "1.0.105"
-sqlx = { version = "0.7.1", features = ["runtime-async-std-native-tls", "postgres", "chrono", "uuid"] }
 uuid = { version = "1.4.1", features = ["serde", "v4"] }
+
+[dependencies.sqlx]
+version =  "0.7.1"
+features = ["macros", "migrate", "runtime-async-std-native-tls", "postgres", "chrono", "uuid"]
+
+[dependencies.rocket_db_pools]
+version = "=0.1.0-rc.3"
+features = ["sqlx_postgres"]
