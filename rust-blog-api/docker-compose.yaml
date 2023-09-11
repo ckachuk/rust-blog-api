@@ -2,10 +2,9 @@ version: "3.7"
 services:
   postgres:
     image: postgres:latest
-    restart: always
     ports:
-      - "5432:5432"
-    container_name: rust-blog-api
+      - "6500:5432"
+    container_name: postgres
     volumes:
       - progresDB:/data/postgres
     env_file:
