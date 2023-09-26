@@ -13,3 +13,10 @@ pub fn bad_request(req: &Request) -> String {
 pub fn not_found(req: &Request) -> String {
     format!("No se encontró la ruta: '{}'.", req.uri())
 }
+
+
+
+#[catch(401)]
+pub fn unauthorized(req: &Request) -> String {
+    format!("Invalid authentication credentials '{}'.", req.uri())
+}

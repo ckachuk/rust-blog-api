@@ -12,21 +12,22 @@ pub struct Category{
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 #[allow(non_snake_case)]
 pub struct Credential{
-    pub credential_id: Uuid,
-    pub is_author: bool,
-    pub is_admin: bool,
+    pub pk_credential_id: Uuid,
+    pub is_author: Option<bool>,
+    pub is_admin: Option<bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 #[allow(non_snake_case)]
 pub struct User{
-    pub user_id: Uuid,
+    pub pk_user_id: Uuid,
     pub credential_id: Uuid,
     pub username: String,
     pub password: String,
     pub fullname: String,
+    pub token: Option<String>,
     #[serde(rename = "createdAt")]
-    pub created_at: Option<chrono::DateTime<chrono::Utc>>,
+    pub create_at: Option<chrono::DateTime<chrono::Utc>>,
     #[serde(rename = "updateAt")]
     pub update_at: Option<chrono::DateTime<chrono::Utc>>
 }

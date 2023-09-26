@@ -10,6 +10,7 @@ pub mod utils;
 use dotenv::dotenv;
 use sqlx::postgres::PgPoolOptions;
 use crate::controllers::category_controller;
+use crate::controllers::user_controller;
 use crate::utils::catchers; 
 
 #[get("/")]
@@ -42,8 +43,17 @@ async fn rocket() -> rocket::Rocket<rocket::Build> {
    
     
     rocket::build()
-    .mount("/", routes![index, category_controller::create_category_controller, category_controller::get_categories_controller, category_controller::get_category_controller, category_controller::delete_categoy_controller, category_controller::update_category_controller])
-    .register("/",rocket::catchers![catchers::bad_request, catchers::not_found])
+    .mount("/", routes![index, 
+    category_controller::create_category_controller, 
+    category_controller::get_categories_controller, 
+    category_controller::get_category_controller, 
+    category_controller::delete_categoy_controller, 
+    category_controller::update_category_controller,
+    user_controller::sign_up_controller,
+    user_controller::login_controller,
+    user_controller::change_password,
+    ])
+    .register("/",rocket::catchers![catchers::bad_request, catchers::not_found, catchers::unauthorized])
     .manage(pool)
     
 }
