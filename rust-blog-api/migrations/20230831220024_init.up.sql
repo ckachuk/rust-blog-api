@@ -12,8 +12,8 @@ CREATE TABLE
 CREATE TABLE
     IF NOT EXISTS credentials(
         pk_credential_id uuid PRIMARY KEY DEFAULT (uuid_generate_v4()),
-        is_author BOOLEAN DEFAULT 'f', 
-        is_admin BOOLEAN DEFAULT 'f'
+        is_author BOOLEAN NOT NULL DEFAULT 'f', 
+        is_admin BOOLEAN NOT NULL DEFAULT 'f'
     );
 CREATE TABLE
     IF NOT EXISTS users(
@@ -22,6 +22,7 @@ CREATE TABLE
         username VARCHAR(50) NOT NULL UNIQUE,
         password VARCHAR(150) NOT NULL,
         fullname VARCHAR (100) NOT NULL,
+        token VARCHAR(150) UNIQUE, 
         CONSTRAINT fk_credential_id FOREIGN KEY(credential_id)
             REFERENCES credentials(pk_credential_id),
         create_at TIMESTAMP 
