@@ -22,7 +22,7 @@ CREATE TABLE
         username VARCHAR(50) NOT NULL UNIQUE,
         password VARCHAR(150) NOT NULL,
         fullname VARCHAR (100) NOT NULL,
-        token VARCHAR(150) UNIQUE, 
+        token VARCHAR(250) UNIQUE, 
         CONSTRAINT fk_credential_id FOREIGN KEY(credential_id)
             REFERENCES credentials(pk_credential_id),
         create_at TIMESTAMP 
@@ -33,8 +33,8 @@ CREATE TABLE
 CREATE TABLE
     IF NOT EXISTS posts(
         pk_post_id uuid PRIMARY KEY DEFAULT (uuid_generate_v4()),
-        user_id uuid NOT NULL UNIQUE,
-        category_id uuid NOT NULL UNIQUE,
+        user_id uuid NOT NULL,
+        category_id uuid NOT NULL,
         title VARCHAR(255) NOT NULL,
         body VARCHAR(255) NOT NULL,
         CONSTRAINT fk_user_id FOREIGN KEY(user_id)

@@ -22,7 +22,7 @@ pub async fn sign_up_controller(pool: &rocket::State<PgPool>, post: Json<CreateU
 
 
 #[post("/login", data = "<post>")]
-pub async fn login_controller(pool: &rocket::State<PgPool>, post: Json<LoginSchema>)-> Result<Json<String>, Status>{
+pub async fn login_controller(pool: &rocket::State<PgPool>, post: Json<LoginSchema<'_>>)-> Result<Json<String>, Status>{
     let query_result = login_service(pool, post).await;
 
     match query_result{
@@ -37,15 +37,15 @@ pub async fn login_controller(pool: &rocket::State<PgPool>, post: Json<LoginSche
             Err(Status::InternalServerError)
             
         }, 
-        Ok(())=>{
-           Ok(Json("valid".to_owned()))
+        Ok(token)=>{
+           Ok(Json(token))
         },
         
     }
 }
 
 #[post("/change_password", data = "<post>")]
-pub async fn change_password(pool: &rocket::State<PgPool>, post: Json<UpdateUserPasswordSchema>)-> Result<Json<String>, Status>{
+pub async fn change_password(pool: &rocket::State<PgPool>, post: Json<UpdateUserPasswordSchema<'_>>)-> Result<Json<String>, Status>{
 
     if post.old_password == post.new_password{
         return Err(Status::BadRequest)

@@ -3,8 +3,8 @@ use chrono::Utc;
 use rocket::serde::json::Json;
 use sqlx::PgPool;
 use uuid::Uuid;
-
-use crate::{models::{User, Credential}, validators::{CreateUserSchema, LoginSchema, UpdateUserPasswordSchema}};
+use jsonwebtoken::{encode, Algorithm,  EncodingKey, Header};
+use crate::{models::{User, Credential}, validators::{CreateUserSchema, LoginSchema, UpdateUserPasswordSchema, TokenClaims}};
 use argon2;
 use argon2::{
     password_hash::{
@@ -61,13 +61,13 @@ async fn hash_password_service(password: String)-> Result<String, Error>{
 }
 
 
-pub async fn update_password_service(pool: &rocket::State<PgPool>, post: Json<UpdateUserPasswordSchema>) -> Result<User, anyhow::Error>{
+pub async fn update_password_service(pool: &rocket::State<PgPool>, post: Json<UpdateUserPasswordSchema<'_>>) -> Result<User, anyhow::Error>{
     
-    verify_password(&post.user_id, post.old_password.clone(), pool).await?;
+    verify_password(&post.username, &post.old_password, pool).await?;
 
     let new_password_parsed_hash = hash_password_service(post.new_password.to_string()).await?;
 
-    let user_updated = sqlx:: query_as!(User, r#"UPDATE users SET password=$1 WHERE users.pk_user_id=$2 RETURNING *"#, new_password_parsed_hash, &post.user_id)
+    let user_updated = sqlx:: query_as!(User, r#"UPDATE users SET password=$1 WHERE users.username=$2 RETURNING *"#, new_password_parsed_hash, &post.username)
     .fetch_one(&**pool)
     .await?;
 
@@ -75,14 +75,23 @@ pub async fn update_password_service(pool: &rocket::State<PgPool>, post: Json<Up
 }
 
 
-pub async fn login_service(pool: &rocket::State<PgPool>, post: Json<LoginSchema>)-> Result<(), anyhow::Error>{
-    verify_password(&post.user_id, post.password.clone(), pool).await?;
+pub async fn login_service(pool: &rocket::State<PgPool>, post: Json<LoginSchema<'_>>)-> Result<String, anyhow::Error>{
+    let user = verify_password(&post.username, &post.password, pool).await?;
    
-    Ok(())
+    let token_claims = TokenClaims{ sub: user.pk_user_id.to_string(), exp: 10000000000};
+    let token_headers =  Header { kid: Some("signing_key".to_owned()), alg: Algorithm::HS512, ..Default::default() };
+    let secret = std::env::var("TOKEN_SECRET")?;
+    let token = encode(&token_headers, &token_claims, &EncodingKey::from_secret(secret.as_bytes()))?;
+
+    sqlx:: query_as!(User, r#"UPDATE users SET token=$1 WHERE users.username=$2 RETURNING *"#, &token, &post.username)
+    .fetch_one(&**pool)
+    .await?;
+
+    Ok(token)
 }
 
-pub async fn verify_password(user_id: &Uuid, user_password: String, pool: &rocket::State<PgPool>)-> Result<(), anyhow::Error>{
-    let user = sqlx::query_as!(User, r#"SELECT * FROM users WHERE users.pk_user_id=$1"#, &user_id)
+pub async fn verify_password(username: &str, user_password: &str, pool: &rocket::State<PgPool>)-> Result<User, anyhow::Error>{
+    let user = sqlx::query_as!(User, r#"SELECT * FROM users WHERE users.username=$1"#, &username)
     .fetch_one(&**pool)
     .await?;
 
@@ -90,5 +99,5 @@ pub async fn verify_password(user_id: &Uuid, user_password: String, pool: &rocke
     
     Argon2::default().verify_password(user_password.as_bytes(), &parsed_hash)?;
    
-    Ok(())
+    Ok(user)
 }
