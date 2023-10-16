@@ -35,13 +35,13 @@ pub struct User{
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 #[allow(non_snake_case)]
 pub struct Post{
-    pub post_id: Uuid,
+    pub pk_post_id: Uuid,
     pub user_id: Uuid,
     pub category_id: Uuid,
     pub title: String,
     pub body: String,
     #[serde(rename = "createdAt")]
-    pub created_at: Option<chrono::DateTime<chrono::Utc>>,
+    pub create_at: Option<chrono::DateTime<chrono::Utc>>,
     #[serde(rename = "updateAt")]
     pub update_at: Option<chrono::DateTime<chrono::Utc>>
 }
@@ -49,12 +49,12 @@ pub struct Post{
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 #[allow(non_snake_case)]
 pub struct Comment{
-    pub comment_id: Uuid,
+    pub pk_comment_id: Uuid,
     pub post_id: Uuid,
     pub user_id: Uuid,
     pub body: String,
     #[serde(rename = "createdAt")]
-    pub created_at: Option<chrono::DateTime<chrono::Utc>>,
+    pub create_at: Option<chrono::DateTime<chrono::Utc>>,
     #[serde(rename = "updateAt")]
     pub update_at: Option<chrono::DateTime<chrono::Utc>>
 }

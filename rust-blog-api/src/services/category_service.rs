@@ -35,7 +35,7 @@ pub async fn get_category_service(pool: &rocket::State<PgPool>, category_id: Uui
     .fetch_one(&**pool)
     .await?;
 
-    Ok(category)
+    Ok(Category{pk_category_id: category.pk_category_id, category_name: category.category_name,})
 }
 
 

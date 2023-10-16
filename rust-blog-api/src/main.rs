@@ -7,6 +7,7 @@ pub mod validators;
 pub mod services;
 pub mod utils;
 
+use controllers::post_controller;
 use dotenv::dotenv;
 use sqlx::postgres::PgPoolOptions;
 use crate::controllers::category_controller;
@@ -52,6 +53,10 @@ async fn rocket() -> rocket::Rocket<rocket::Build> {
     user_controller::sign_up_controller,
     user_controller::login_controller,
     user_controller::change_password,
+    post_controller::create_post_controller,
+    post_controller::get_posts_controller,
+    post_controller::get_user_posts_controller,
+    post_controller::update_post_controller
     ])
     .register("/",rocket::catchers![catchers::bad_request, catchers::not_found, catchers::unauthorized])
     .manage(pool)
